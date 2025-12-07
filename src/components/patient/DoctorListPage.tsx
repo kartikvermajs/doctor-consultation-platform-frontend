@@ -97,7 +97,7 @@ const DoctorListPage = () => {
               {activeFilterCount > 0 && (
                 <Badge
                   variant="secondary"
-                  className="ml-2 bg-blue-300 text-blue-800"
+                  className="ml-2 bg-green-300 text-green-800"
                 >
                   {activeFilterCount}
                 </Badge>
@@ -282,12 +282,12 @@ const DoctorListPage = () => {
                         alt={doctor.name}
                         className="object-cover"
                       />
-                      <AvatarFallback className="bg-gradient-to-br from-blue-100 to-blue-200 text-blue-700 text-xl font-bold">
+                      <AvatarFallback className="bg-gradient-to-br from-green-100 to-green-200 text-green-700 text-xl font-bold">
                         {doctor.name.charAt(0)}
                       </AvatarFallback>
                     </Avatar>
 
-                    <h3 className="text-lg font-bold text-blue-700 mb-1">
+                    <h3 className="text-lg font-bold text-green-700 mb-1">
                       {doctor.name}
                     </h3>
                     <p className="text-gray-600 text-sm mb-1">
@@ -317,7 +317,7 @@ const DoctorListPage = () => {
                       <Badge
                         key={idx}
                         variant="secondary"
-                        className="bg-blue-50 text-blue-700 border-blue-200 text-xs"
+                        className="bg-green-50 text-green-700 border-green-200 text-xs"
                       >
                         {category}
                       </Badge>
@@ -350,7 +350,7 @@ const DoctorListPage = () => {
 
                   <div className="mt-auto">
                     <Link href={`/patient/booking/${doctor._id}`} className="block">
-                    <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg ply-2 text-sm font-medium shadow-lg hover:shadow-xl transition-all">
+                    <Button className="w-full bg-green-600 hover:bg-green-700 text-white rounded-lg ply-2 text-sm font-medium shadow-lg hover:shadow-xl transition-all">
                         Book Appointment
                     </Button>
                     </Link>

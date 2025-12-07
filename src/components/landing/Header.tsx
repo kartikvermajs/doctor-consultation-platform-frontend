@@ -79,11 +79,11 @@ const Header: React.FC<HeaderProps> = ({ showDashboardNav = false }) => {
         {/* Left side -> logo  + navigation */}
         <div className="flex items-center space-x-8">
           <Link href="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-gradient-to-br from-green-600 to-green-700 rounded-lg flex items-center justify-center">
               <Stethoscope className="w-5 h-5 text-white" />
             </div>
 
-            <div className="text-2xl font-bold bg-gradient-to-br from-blue-600 to-blue-800  bg-clip-text text-transparent">
+            <div className="text-2xl font-bold bg-gradient-to-br from-green-600 to-green-800  bg-clip-text text-transparent">
               CuraVault+
             </div>
           </Link>
@@ -97,8 +97,8 @@ const Header: React.FC<HeaderProps> = ({ showDashboardNav = false }) => {
                   href={item.href}
                   className={`flex items-center space-x-1 transition-colors ${
                     item.active
-                      ? "text-blue-600 font-semibold"
-                      : "text-gray-600 hover:text-blue-600"
+                      ? "text-green-600 font-semibold"
+                      : "text-gray-600 hover:text-green-600"
                   }`}
                 >
                   <item.icon className="w-4 h-4" />
@@ -129,7 +129,7 @@ const Header: React.FC<HeaderProps> = ({ showDashboardNav = false }) => {
                       src={user?.profileImage}
                       alt={user?.name}
                     ></AvatarImage>
-                    <AvatarFallback className="bg-blue-100 text-blue-600 text-sm font-semibold">
+                    <AvatarFallback className="bg-green-100 text-green-600 text-sm font-semibold">
                       {user?.name?.charAt(0)?.toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
@@ -151,7 +151,7 @@ const Header: React.FC<HeaderProps> = ({ showDashboardNav = false }) => {
                         src={user?.profileImage}
                         alt={user?.name}
                       ></AvatarImage>
-                      <AvatarFallback className="bg-blue-100 text-blue-600 ">
+                      <AvatarFallback className="bg-green-100 text-green-600 ">
                         {user?.name?.charAt(0)?.toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
@@ -202,14 +202,14 @@ const Header: React.FC<HeaderProps> = ({ showDashboardNav = false }) => {
                 <Link href="/login/patient">
                   <Button
                     variant="ghost"
-                    className="text-blue-900 font-medium hover:text-blue-700"
+                    className="text-green-900 font-medium hover:text-green-700"
                   >
                     Log in
                   </Button>
                 </Link>
 
                 <Link href="/signup/patient" className="hidden md:block">
-                  <Button className="bg-gradient-to-r from-blue-600 to-blue-700  font-medium hover:from-blue-700 hover:to-blue-800 rounded-full px-6">
+                  <Button className="bg-gradient-to-r from-green-600 to-green-700  font-medium hover:from-green-700 hover:to-green-800 rounded-full px-6">
                     Book Consultation
                   </Button>
                 </Link>
@@ -223,7 +223,7 @@ const Header: React.FC<HeaderProps> = ({ showDashboardNav = false }) => {
                 <Link href={`/${user?.type}/dashboard`}>
                   <Button
                     variant="ghost"
-                    className="text-blue-900 font-medium hover:text-blue-700"
+                    className="text-green-900 font-medium hover:text-green-700"
                   >
                     Dashboard
                   </Button>

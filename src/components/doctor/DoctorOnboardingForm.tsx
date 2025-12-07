@@ -179,7 +179,7 @@ const DoctorOnboardingForm = () => {
                       />
                       <label
                         htmlFor={category}
-                        className="text-sm font-medium cursor-pointer hover:text-blue-600"
+                        className="text-sm font-medium cursor-pointer hover:text-green-600"
                       >
                         {category}
                       </label>

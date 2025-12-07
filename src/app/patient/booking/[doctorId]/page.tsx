@@ -176,9 +176,9 @@ const page = () => {
 
   if (!currentDoctor) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-indigo-100 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-green-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">Loading doctor information...</p>
         </div>
       </div>
@@ -188,7 +188,7 @@ const page = () => {
   console.log("this is my current doctor", currentDoctor);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-indigo-100">
       <div className="bg-white border-b shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
@@ -217,13 +217,13 @@ const page = () => {
                 <React.Fragment key={step}>
                   <div
                     className={`flex items-center space-x-2 ${
-                      currentStep >= step ? "text-blue-600" : "text-gray-400"
+                      currentStep >= step ? "text-green-600" : "text-gray-400"
                     }`}
                   >
                     <div
                       className={`w-8 h-8 rounded-full border-2 ${
                         currentStep >= step
-                          ? "bg-blue-600 border-blue-600 "
+                          ? "bg-green-600 border-green-600 "
                           : "border-gray-200"
                       } flex items-center justify-center`}
                     >

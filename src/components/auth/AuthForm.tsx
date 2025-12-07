@@ -91,7 +91,7 @@ interface AuthFormProps {
   return (
     <div className="w-full max-w-md mx-auto">
       <div className="text-center mb-8">
-        <h1 className="text-2xl font-bold text-blue-900">CuraVault+</h1>
+        <h1 className="text-2xl font-bold text-green-900">CuraVault+</h1>
       </div>
 
       <Card className="border-0 shadow-xl">
@@ -114,7 +114,7 @@ interface AuthFormProps {
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="border-0 border-b-2 border-gray-300 rounded-none focus:border-blue-600 focus-visible:ring-0"
+                  className="border-0 border-b-2 border-gray-300 rounded-none focus:border-green-600 focus-visible:ring-0"
                   required
                 />
               </div>
@@ -128,7 +128,7 @@ interface AuthFormProps {
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="border-0 border-b-2 border-gray-300 rounded-none focus:border-blue-600 focus-visible:ring-0"
+                className="border-0 border-b-2 border-gray-300 rounded-none focus:border-green-600 focus-visible:ring-0"
                 required
               />
             </div>
@@ -142,7 +142,7 @@ interface AuthFormProps {
                   type={showPassword ? 'text' : 'password'}
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="border-0 border-b-2 border-gray-300 rounded-none focus:border-blue-600 focus-visible:ring-0 pr-10"
+                  className="border-0 border-b-2 border-gray-300 rounded-none focus:border-green-600 focus-visible:ring-0 pr-10"
                   required
                 />
                 <Button
@@ -171,15 +171,15 @@ interface AuthFormProps {
                 />
                 <label htmlFor="terms" className="text-sm text-gray-600 leading-5">
                   I confirm that I am over 18 years old and agree to CuraVault+'s{' '}
-                  <Link href="#" className="text-blue-600 hover:underline">Terms</Link> and{' '}
-                  <Link href="#" className="text-blue-600 hover:underline">Privacy Policy</Link>.
+                  <Link href="#" className="text-green-600 hover:underline">Terms</Link> and{' '}
+                  <Link href="#" className="text-green-600 hover:underline">Privacy Policy</Link>.
                 </label>
               </div>
             )}
 
             <Button 
               type="submit" 
-              className="w-full bg-blue-600 hover:bg-blue-700 rounded-full py-3"
+              className="w-full bg-green-600 hover:bg-green-700 rounded-full py-3"
               disabled={loading || (isSignup && !agreeToTerms)}
             >
               {loading ? `${type === 'signup' ? 'Creating' : 'Signing'} in...` : buttonText}
@@ -216,7 +216,7 @@ interface AuthFormProps {
             <span className="text-gray-600">{altLinkText} </span>
             <Link 
               href={altLinkPath}
-              className="text-blue-600 hover:underline font-medium"
+              className="text-green-600 hover:underline font-medium"
             >
               {altLinkAction}
             </Link>

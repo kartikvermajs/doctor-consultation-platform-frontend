@@ -27,9 +27,9 @@ const layout = ({children}:{children:React.ReactNode}) => {
      </div>
 
      <div className='hidden lg:block w-1/2 relative overflow-hidden'>
-         <div className='absolute inset-0 bg-gradient-to-br from-blue-900/20 to-transparent z-10'>
+         <div className='absolute inset-0 bg-gradient-to-br from-green-900/20 to-transparent z-10'>
          </div>
-         <div className='w-full h-full bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 flex items-center justify-center'>
+         <div className='w-full h-full bg-gradient-to-br from-green-600 via-green-700 to-green-800 flex items-center justify-center'>
             <div className='text-center text-white p-8 max-w-md'>
               <div className='w-20 h-20 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-6 backdrop:blur-sm'>
                          <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">

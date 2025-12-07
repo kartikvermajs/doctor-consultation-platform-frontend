@@ -101,7 +101,7 @@ const PatientDashboardContent = () => {
                 src={appointment.doctorId?.profileImage}
                 alt={appointment.doctorId?.name}
               />
-              <AvatarFallback className="bg-blue-100 text-blue-600 text-lg font-semibold">
+              <AvatarFallback className="bg-green-100 text-green-600 text-lg font-semibold">
                 {appointment.doctorId?.name?.charAt(0)}
               </AvatarFallback>
             </Avatar>
@@ -127,7 +127,7 @@ const PatientDashboardContent = () => {
                   {appointment.status}
                 </Badge>
                 {isToday(appointment.slotStartIso) && (
-                  <div className="text-xs text-blue-600 font-semibold mt-1">
+                  <div className="text-xs text-green-600 font-semibold mt-1">
                     TODAY
                   </div>
                 )}

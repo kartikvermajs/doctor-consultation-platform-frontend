@@ -13,12 +13,12 @@ const DoctorProfile = ({ doctor }: DoctorPrfileInterface) => {
     <Card className="sticky top-8 shadow-lg border-0">
       <CardContent className="p-8">
         <div className="text-center mb-6">
-          <Avatar className="w-32 h-32 mx-auto right-4 rign-blue-100">
+          <Avatar className="w-32 h-32 mx-auto right-4 rign-green-100">
             <AvatarImage
               src={doctor?.profileImage}
               alt={doctor?.name}
             ></AvatarImage>
-            <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600  text-white text-2xl font-bold ">
+            <AvatarFallback className="bg-gradient-to-br from-green-500 to-green-600  text-white text-2xl font-bold ">
               {doctor?.name?.charAt(0)?.toUpperCase()}
             </AvatarFallback>
           </Avatar>
@@ -62,7 +62,7 @@ const DoctorProfile = ({ doctor }: DoctorPrfileInterface) => {
               <Badge
                 key={idx}
                 variant="secondary"
-                className="bg-blue-100 text-blue-800"
+                className="bg-green-100 text-green-800"
               >
                 {cat}
               </Badge>

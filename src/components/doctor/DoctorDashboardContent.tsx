@@ -118,7 +118,7 @@ const DoctorDashboardContent = () => {
     return (
       <>
         <Header showDashboardNav={true} />
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 pt-16">
+        <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-indigo-50 pt-16">
           <div className="container mx-auto px-4 py-8">
             <div className="animate-pulse space-y-8">
               <div className="flex items-center space-x-4">
@@ -147,8 +147,8 @@ const DoctorDashboardContent = () => {
       title: "Total Patients",
       value: dashboardData?.stats?.totalPatients?.toString() || "0",
       icon: Users,
-      color: "text-blue-600",
-      bgColor: "bg-blue-50",
+      color: "text-green-600",
+      bgColor: "bg-green-50",
       change: "+12%",
       changeColor: "text-green-600",
     },
@@ -186,12 +186,12 @@ const DoctorDashboardContent = () => {
     <>
       <Header showDashboardNav={true} />
 
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 pt-16">
+      <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-indigo-50 pt-16">
         <div className="container mx-auto px-4 py-8">
           <div className="mb-8">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4 ">
-                <Avatar className="w-20 h-20 ring-4 ring-blue-100">
+                <Avatar className="w-20 h-20 ring-4 ring-green-100">
                   <AvatarImage
                     src={dashboardData?.user?.profileImage}
                     alt={dashboardData?.user?.name}
@@ -228,7 +228,7 @@ const DoctorDashboardContent = () => {
 
               <div className="hidden md:flex items-center space-x-3">
                 <Link href="/doctor/profile">
-                  <Button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800">
+                  <Button className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800">
                     <Plus className="w-4 h-4 mr-2" />
                     Update Availability
                   </Button>
@@ -275,7 +275,7 @@ const DoctorDashboardContent = () => {
             <Card className="lg:col-span-2 hover:shadow-lg transition-shadow">
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="flex items-center space-x-2">
-                  <Calendar className="w-5 h-5 text-blue-500" />
+                  <Calendar className="w-5 h-5 text-green-500" />
                   <span>Today's Schedule</span>
                   <Badge variant="secondary" className="ml-2">
                     {dashboardData?.todayAppointments?.length} appointments
@@ -296,15 +296,15 @@ const DoctorDashboardContent = () => {
                         key={appointment?._id}
                         className="flex items-center space-x-4 p-4 border rounded-lg hover:bg-gray-50 transition-colors"
                       >
-                        <div className="flex items-center justify-center w-12 h-12 bg-blue-100 rounded-lg">
-                          <Clock className="w-6 h-6 text-blue-600" />
+                        <div className="flex items-center justify-center w-12 h-12 bg-green-100 rounded-lg">
+                          <Clock className="w-6 h-6 text-green-600" />
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center justify-between">
                             <h4 className="font-semibold text-gray-900">
                               {appointment?.patientId?.name}
                             </h4>
-                            <div className="text-sm font-medium text-blue-600 ">
+                            <div className="text-sm font-medium text-green-600 ">
                               {formateDate(appointment.slotStartIso)}
                             </div>
                           </div>
@@ -325,7 +325,7 @@ const DoctorDashboardContent = () => {
                             <div className="flex items-center space-x-1">
                               {appointment.consultationType ===
                               "Video Consultation" ? (
-                                <Video className="w-4 h-4 text-blue-600" />
+                                <Video className="w-4 h-4 text-green-600" />
                               ) : (
                                 <Phone className="w-4 h-4 text-green-600" />
                               )}
@@ -367,7 +367,7 @@ const DoctorDashboardContent = () => {
               <Card className="hover:shadow-lg transition-shadow">
                 <CardHeader className="flex flex-row items-center justify-between">
                   <CardTitle className="flex items-center space-x-2">
-                    <Clock className="w-5 h-5 text-blue-500" />
+                    <Clock className="w-5 h-5 text-green-500" />
                     <span>Upcoming</span>
                   </CardTitle>
                   <Link href="/doctor/appointments">
@@ -397,13 +397,13 @@ const DoctorDashboardContent = () => {
                             <h4 className="font-semibold text-gray-900 text-sm truncate">
                               {appointment?.patientId?.name}
                             </h4>
-                            <div className="text-sm font-medium text-blue-600 ">
+                            <div className="text-sm font-medium text-green-600 ">
                               {formateDate(appointment.slotStartIso)}
                             </div>
                             <div className="flex items-center space-x-1 mt-1">
                               {appointment.consultationType ===
                               "Video Consultation" ? (
-                                <Video className="w-4 h-4 text-blue-600" />
+                                <Video className="w-4 h-4 text-green-600" />
                               ) : (
                                 <Phone className="w-4 h-4 text-green-600" />
                               )}
@@ -429,7 +429,7 @@ const DoctorDashboardContent = () => {
               <Card className="hover:shadow-lg transition-shadow">
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-2">
-                    <TrendingUp className="w-5 h-5 text-blue-500" />
+                    <TrendingUp className="w-5 h-5 text-green-500" />
                     <span>Performance</span>
                   </CardTitle>
                 </CardHeader>
@@ -458,7 +458,7 @@ const DoctorDashboardContent = () => {
                     <span className="text-sm text-gray-600">
                       Response Time
                     </span>
-                    <span className="font-semibold text-blue-600">
+                    <span className="font-semibold text-green-600">
                       {dashboardData?.performance?.responseTime}
                     </span>
                   </div>

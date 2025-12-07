@@ -53,7 +53,7 @@ const ConsultationStep = ({
                     key={type}
                     className={`relative border-2 rounded-lg p-4 cursor-pointer transition-all ${
                       isSelected
-                        ? "border-blue-500 bg-blue-50"
+                        ? "border-green-500 bg-green-50"
                         : "border-gray-200 hover:border-gray-300"
                     }`}
                     onClick={() => handleTypeChnage(type)}
@@ -66,12 +66,12 @@ const ConsultationStep = ({
                     <div className="flex items-center space-x-4">
                       <div
                         className={`w-12 h-12 rounded-lg flex items-center justify-center ${
-                          isSelected ? "bg-blue-100" : "bg-gray-100"
+                          isSelected ? "bg-green-100" : "bg-gray-100"
                         }`}
                       >
                         <Icon
                           className={`w-6 h-6 ${
-                            isSelected ? "text-blue-600" : "text-gray-600"
+                            isSelected ? "text-green-600" : "text-gray-600"
                           }`}
                         />
                       </div>
@@ -97,12 +97,12 @@ const ConsultationStep = ({
           </div>
         </div>
 
-        <div className="mb-8 p-4 bg-blue-50 rounded-lg">
+        <div className="mb-8 p-4 bg-green-50 rounded-lg">
           <div className="flex justify-between items-center">
-            <span className="font-semibold text-blue-900">
+            <span className="font-semibold text-green-900">
               Selected Consultation:
             </span>
-            <span className="text-lg font-bold text-blue-900">
+            <span className="text-lg font-bold text-green-900">
               {consultationType} - ₹{getConsultationPrice()}
             </span>
           </div>
@@ -121,7 +121,7 @@ const ConsultationStep = ({
             value={symptoms}
             onChange={(e) => setSymptoms(e.target.value)}
             rows={5}
-            className="resize-none border-2 focus:border-blue-500"
+            className="resize-none border-2 focus:border-green-500"
           />
         </div>
       </div>
@@ -133,7 +133,7 @@ const ConsultationStep = ({
         <Button
           onClick={onContinue}
           disabled={!symptoms.trim()}
-          className="px-7 py-3 bg-blue-600 hover:bg-blue-700"
+          className="px-7 py-3 bg-green-600 hover:bg-green-700"
         >
           Continue to Payment
         </Button>

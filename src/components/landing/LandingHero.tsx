@@ -28,12 +28,12 @@ const LandingHero = () => {
            }
     }
   return (
-    <section className='py-20 px-4 bg-gradient-to-b from-blue-50 to-white'>
+    <section className='py-20 px-4 bg-gradient-to-b from-green-50 to-white'>
 
         <div className='container mx-auto text-center'>
-            <h1 className='text-5xl md:text-6xl font-bold text-blue-900 leading-tight mb-6'>
+            <h1 className='text-5xl md:text-6xl font-bold text-green-900 leading-tight mb-6'>
                 The place where <br/>
-                <span className='text-blue-900'>
+                <span className='text-green-900'>
                     doctors listen - to you
                 </span>
             </h1>
@@ -41,11 +41,11 @@ const LandingHero = () => {
                 Online primary care that's affordable with or without insurance. Quality healthcare, accessible anytime, anywhere.
             </p>
             <div className='flex flex-col sm:flex-row gap-4 justify-center mb-12'>
-                     <Button onClick={handleBookConsultation} size='lg' className='bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 rounded-full px-8 py-3 text-lg'> 
+                     <Button onClick={handleBookConsultation} size='lg' className='bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 rounded-full px-8 py-3 text-lg'> 
                         Book a video visit
                      </Button>
                      <Link href='/login/doctor'>
-                        <Button size='lg' variant='outline' className='w-full border-blue-600 text-blue-600   hover:bg-blue-50 rounded-full px-8 py-3 text-lg'> 
+                        <Button size='lg' variant='outline' className='w-full border-green-600 text-green-600   hover:bg-green-50 rounded-full px-8 py-3 text-lg'> 
                          Login as Doctor
                      </Button>
                      </Link>
@@ -69,7 +69,7 @@ const LandingHero = () => {
                                 <path d={category.icon}/>
                              </svg>
                          </div>
-                         <span className='text-xs font-medium text-blue-900 text-center leading-tight'>
+                         <span className='text-xs font-medium text-green-900 text-center leading-tight'>
                             {category.title}
                          </span>
                         </button>

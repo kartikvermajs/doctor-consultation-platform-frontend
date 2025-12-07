@@ -5,7 +5,7 @@ export const healthcareCategories = [
     id: 'primary-care',
     title: 'Primary Care',
     icon: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z',
-    color: 'bg-blue-500'
+    color: 'bg-green-500'
   },
   {
     id: 'manage-condition',
@@ -242,7 +242,7 @@ export  const cities = ['Mumbai', 'Delhi', 'Bangalore', 'Chennai', 'Kolkata', 'H
     switch (status.toLowerCase()) {
       case 'confirmed': return 'bg-green-100 text-green-800';
       case 'pending': return 'bg-yellow-100 text-yellow-800';
-      case 'completed': return 'bg-blue-100 text-blue-800';
+      case 'completed': return 'bg-green-100 text-green-800';
       case 'cancelled': return 'bg-red-100 text-red-800';
       case 'in progress': return 'bg-purple-100 text-purple-800';
       default: return 'bg-gray-100 text-gray-800';

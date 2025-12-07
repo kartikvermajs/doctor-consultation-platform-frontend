@@ -17,7 +17,7 @@ const layout = ({children}:{children:React.ReactNode}) => {
     <div className='min-h-screen bg-gray-50 flex flex-col'>
         <header className='bg-white border-b px-6 py-4'>
             <div className='max-w-4xl mx-auto'>
-                <div className='text-2xl font-bold text-blue-900'>
+                <div className='text-2xl font-bold text-green-900'>
                 CuraVault+
                 </div>
             </div>

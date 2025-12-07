@@ -112,8 +112,8 @@ const CalendarStep = ({
                   disabled={isDateDisabled}
                   className="rounded-md"
                   classNames={{
-                     day_selected: 'bg-blue-600 text-white hover:bg-blue-600 hover:text-white focus:bg-blue-600 foucus:text-white',
-                     day_today: 'bg-blue-100 text-blue-900 font-bold',
+                     day_selected: 'bg-green-600 text-white hover:bg-green-600 hover:text-white focus:bg-green-600 foucus:text-white',
+                     day_today: 'bg-green-100 text-green-900 font-bold',
                      day_disabled: 'text-gray-300 opacity-50 cursor-not-allowed'
                   }}
                  />
@@ -148,7 +148,7 @@ const CalendarStep = ({
                               key={slot}
                                variant={isSelected ? 'default' : 'outline'}
                                disabled={isDisabled}
-                               className={`p-3 justify-start ${isDisabled ? 'opacity-50 cursor-not-allowed bg-gray-100 text-gray-400 border-gray-200' : isSelected ? "bg-blue-600 text-white shadow-lg" : "hover:border-blue-200 hover:bg-blue-50"}`}
+                               className={`p-3 justify-start ${isDisabled ? 'opacity-50 cursor-not-allowed bg-gray-100 text-gray-400 border-gray-200' : isSelected ? "bg-green-600 text-white shadow-lg" : "hover:border-green-200 hover:bg-green-50"}`}
                                onClick={() => !isDisabled && setSelectedSlot(slot)}
                              >
 
@@ -205,7 +205,7 @@ const CalendarStep = ({
            <Button
            onClick={onContinue}
            disabled={!selectedDate || !selectedSlot}
-           className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-lg font-semibold"
+           className="px-8 py-3 bg-green-600 hover:bg-green-700 text-lg font-semibold"
           >
             Continue
           </Button>

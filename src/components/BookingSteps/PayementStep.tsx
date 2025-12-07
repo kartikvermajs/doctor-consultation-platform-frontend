@@ -249,7 +249,7 @@ const PayementStep = ({
               exit={{ opacity: 0, scale: 0.95 }}
               className="text-center py-12"
             >
-              <Loader2 className="w-12 h-12 mx-auto mb-4 text-blue-600 animate-spin" />
+              <Loader2 className="w-12 h-12 mx-auto mb-4 text-green-600 animate-spin" />
               <h4 className="text-lg font-semibold text-gray-900 mb-2">
                 Processing Payment...
               </h4>

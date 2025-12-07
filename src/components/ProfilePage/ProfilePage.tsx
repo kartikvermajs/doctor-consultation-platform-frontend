@@ -765,7 +765,7 @@ const ProfilePage = ({ userType }: ProfileProps) => {
             <div className="flex flex-col items-center">
               <Avatar className="w-24 h-24">
                 <AvatarImage src={user?.profileImage} alt={user?.name} />
-                <AvatarFallback className="bg-blue-100 text-blue-600 text-2xl font-bold">
+                <AvatarFallback className="bg-green-100 text-green-600 text-2xl font-bold">
                   {user?.name?.charAt(0).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
@@ -782,7 +782,7 @@ const ProfilePage = ({ userType }: ProfileProps) => {
                     onClick={() => setActiveSection(item.id)}
                     className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-colors ${
                       activeSection === item.id
-                        ? "bg-blue-100 text-blue-600 border border-blue-200"
+                        ? "bg-green-100 text-green-600 border border-green-200"
                         : "text-gray-600 hover:bg-gray-100"
                     }`}
                   >

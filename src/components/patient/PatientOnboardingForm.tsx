@@ -140,7 +140,7 @@ const PatientOnboardingForm = () => {
               <div
                 className={`flex items-center justify-center w-10 h-10 rounded-full border-2 ${
                   currentStep >= step
-                    ? "bg-blue-600 border-blue-600 text-white"
+                    ? "bg-green-600 border-green-600 text-white"
                     : "border-gray-300 text-gray-400"
                 }`}
               >
@@ -150,7 +150,7 @@ const PatientOnboardingForm = () => {
               {step < 3 && (
                 <div
                   className={`w-20 h-1 ${
-                    currentStep > step ? "bg-blue-600" : "bg-gray-300"
+                    currentStep > step ? "bg-green-600" : "bg-gray-300"
                   }`}
                 ></div>
               )}
@@ -164,7 +164,7 @@ const PatientOnboardingForm = () => {
           {currentStep === 1 && (
             <div className="space-y-6">
               <div className="flex items-center space-x-2 mb-6">
-                <User className="w-5 h-5 text-blue-600" />
+                <User className="w-5 h-5 text-green-600" />
                 <h2 className="text-xl font-semibold">Basic Information</h2>
               </div>
 
@@ -244,7 +244,7 @@ const PatientOnboardingForm = () => {
           {currentStep === 2 && (
             <div className="space-y-6">
               <div className="flex items-center space-x-2 mb-6">
-                <Phone className="w-5 h-5 text-blue-600" />
+                <Phone className="w-5 h-5 text-green-600" />
                 <h2 className="text-xl font-semibold">Emergency Contact</h2>
               </div>
               <Alert>
@@ -312,7 +312,7 @@ const PatientOnboardingForm = () => {
            {currentStep === 3 && (
             <div className="space-y-6">
               <div className="flex items-center space-x-2 mb-6">
-                <Phone className="w-5 h-5 text-blue-600" />
+                <Phone className="w-5 h-5 text-green-600" />
                 <h2 className="text-xl font-semibold">Medical Infomation</h2>
               </div>
               <Alert>

@@ -46,7 +46,7 @@ const PrescriptionModal = ({
       <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <div className="flex items-center space-x-2">
-            <FileText className="w-5 h-5 text-blue-600" />
+            <FileText className="w-5 h-5 text-green-600" />
             <CardTitle>Complete Consultation</CardTitle>
           </div>
           <Button variant="ghost" size="sm" onClick={handleClose}>
@@ -54,14 +54,14 @@ const PrescriptionModal = ({
           </Button>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="flex items-start space-x-3 p-4 bg-blue-50 rounded-lg">
-            <AlertTitle className="w-5 h-5 text-blue-600 mt-0.5" />
+          <div className="flex items-start space-x-3 p-4 bg-green-50 rounded-lg">
+            <AlertTitle className="w-5 h-5 text-green-600 mt-0.5" />
 
             <div>
-              <h3 className="font-semibold text-blue-900">
+              <h3 className="font-semibold text-green-900">
                 Confirm Consultation Completion
               </h3>
-              <p className="text-sm text-blue-700 mt-1">
+              <p className="text-sm text-green-700 mt-1">
                 Are your sure you want to mark the consultation with{" "}
                 <strong>{patientName}</strong> as completed?
               </p>
