@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { FileText, Trash2, Upload, Loader2 } from "lucide-react";
 import { Button } from "../ui/button";
-import axios from "axios";
+import { postFormWithAuth } from "@/service/httpService";
 
 interface Props {
   appointmentId: string;
@@ -26,16 +26,20 @@ export default function DeferredUploadDocuments({
     setFiles((f) => f.filter((_, i) => i !== index));
 
   const submit = async () => {
+    if (!files.length) return;
+
     const form = new FormData();
-    files.forEach((f) => form.append("documents", f));
+    files.forEach((file) => form.append("documents", file));
 
     setUploading(true);
     try {
-      await axios.post(`/appointments/${appointmentId}/documents`, form, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      await postFormWithAuth(`/appointments/${appointmentId}/documents`, form);
+
       setFiles([]);
       onSuccess();
+    } catch (error) {
+      console.error("Upload failed:", error);
+      alert("Upload failed");
     } finally {
       setUploading(false);
     }

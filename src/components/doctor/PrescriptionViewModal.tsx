@@ -249,6 +249,7 @@ import {
 } from "lucide-react";
 import { Button } from "../ui/button";
 import axios from "axios";
+import { postFormWithAuth } from "@/service/httpService";
 
 interface PrescriptionViewModalProps {
   appointment: Appointment;
@@ -305,9 +306,10 @@ const PrescriptionViewModal = ({
 
     setUploading(true);
     try {
-      await axios.post(`/appointments/${appointment._id}/documents`, form, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      await postFormWithAuth(
+        `/appointments/${appointment._id}/documents`,
+        form,
+      );
 
       setFiles([]);
       await fetchAppointmentById(appointment._id);
@@ -327,7 +329,9 @@ const PrescriptionViewModal = ({
 
     setDeletingKey(key);
     try {
-      await axios.delete(`/api/appointments/${appointment._id}/documents/${key}`);
+      await axios.delete(
+        `/api/appointments/${appointment._id}/documents/${key}`,
+      );
       await fetchAppointmentById(appointment._id);
     } finally {
       setDeletingKey(null);
