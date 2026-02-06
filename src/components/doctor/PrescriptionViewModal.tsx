@@ -440,13 +440,10 @@ const PrescriptionViewModal = ({
 
                   <UploadDropzone
                     endpoint="medicalDocuments"
-                    headers={{
-                      Authorization: `Bearer ${localStorage.getItem("token")}`,
-                    }}
                     onUploadBegin={() => setUploading(true)}
                     onClientUploadComplete={(res) => {
                       setUploading(false);
-                      if (!res || res.length === 0) return;
+                      if (!res?.length) return;
 
                       uploadDocuments(
                         appointment._id,
@@ -460,14 +457,7 @@ const PrescriptionViewModal = ({
                     onUploadError={(error) => {
                       setUploading(false);
                       console.error(error);
-                      alert("Upload failed");
-                    }}
-                    appearance={{
-                      container:
-                        "border-dashed border-2 border-gray-300 rounded-lg p-6 hover:border-green-500 transition",
-                      label: "text-sm text-gray-600",
-                      uploadIcon: "text-green-600",
-                      allowedContent: "hidden",
+                      alert(error.message);
                     }}
                   />
 

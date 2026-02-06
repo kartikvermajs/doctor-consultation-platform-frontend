@@ -1,21 +1,19 @@
-import jwt from "jsonwebtoken"
+import jwt from "jsonwebtoken";
+import { cookies } from "next/headers";
 
 export interface AuthUser {
   id: string;
   type: "doctor" | "patient";
 }
 
-export function getUserFromAuthHeader(req: Request): AuthUser | null {
+export async function getUserFromRequest(): Promise<AuthUser | null> {
   try {
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader) return null;
+    const cookieStore = await cookies();
+    const token = cookieStore.get("token")?.value;
 
-    const token = authHeader.replace("Bearer ", "");
     if (!token) return null;
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as AuthUser;
-
-    return decoded;
+    return jwt.verify(token, process.env.JWT_SECRET!) as AuthUser;
   } catch {
     return null;
   }

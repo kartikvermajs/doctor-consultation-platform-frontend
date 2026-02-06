@@ -1,5 +1,5 @@
 import { createUploadthing } from "uploadthing/next";
-import { getUserFromAuthHeader } from "@/lib/auth";
+import { getUserFromRequest } from "@/lib/auth";
 
 const f = createUploadthing();
 
@@ -8,8 +8,8 @@ export const ourFileRouter = {
     image: { maxFileSize: "8MB" },
     pdf: { maxFileSize: "16MB" },
   })
-    .middleware(async ({ req }) => {
-      const user = getUserFromAuthHeader(req);
+    .middleware(async () => {
+      const user = await getUserFromRequest();
 
       if (!user || user.type !== "doctor") {
         throw new Error("Unauthorized");
@@ -25,5 +25,4 @@ export const ourFileRouter = {
     }),
 };
 
-// ✅ EXPORT THE TYPE (THIS FIXES THE ERROR)
 export type OurFileRouter = typeof ourFileRouter;
