@@ -15,16 +15,8 @@ class HttpService {
   private getAuthHeaders(): Record<string, string> {
     const token = localStorage.getItem("token");
     return {
-      "Content-Type": "application/json",
       ...(token && { Authorization: `Bearer ${token}` }),
     };
-  }
-
-  private getHeaders(auth: boolean = true): Record<string, string> {
-    if (auth) {
-      return this.getAuthHeaders();
-    }
-    return { "Content-Type": "application/json" };
   }
 
   private async makeRequest<T = any>(
@@ -36,38 +28,52 @@ class HttpService {
   ): Promise<ApiResponse<T>> {
     try {
       const url = `${BASE_URL}${endPoint}`;
-      const headers = {
-        ...this.getHeaders(auth),
+
+      const isFormData = body instanceof FormData;
+
+      const headers: Record<string, string> = {
+        ...(auth ? this.getAuthHeaders() : {}),
         ...options?.headers,
       };
+
+      // IMPORTANT:
+      // - Do NOT set Content-Type for FormData
+      // - Browser sets multipart boundary automatically
+      if (!isFormData) {
+        headers["Content-Type"] = "application/json";
+      }
 
       const config: RequestInit = {
         method,
         headers,
-        ...(body && { body: JSON.stringify(body) }),
+        ...(body && {
+          body: isFormData ? body : JSON.stringify(body),
+        }),
       };
 
       const response = await fetch(url, config);
       const data: ApiResponse<T> = await response.json();
+
       if (!response.ok) {
         throw new Error(
-          data.message || `HTTP ${response.status}: ${response.statusText}`,
+          data?.message || `HTTP ${response.status}: ${response.statusText}`,
         );
       }
+
       return data;
     } catch (error: any) {
-      console.error(`Api Error [${method} ${endPoint} ]:`, error);
-      console.log(error);
+      console.error(`Api Error [${method} ${endPoint}]:`, error);
       throw error;
     }
   }
 
-  //Method with authentication
+  /* ---------------- AUTH REQUESTS ---------------- */
+
   async getWithAuth<T = any>(
     endPoint: string,
     options?: RequestOptions,
   ): Promise<ApiResponse<T>> {
-    return this.makeRequest<T>(endPoint, "GET", null, true, options);
+    return this.makeRequest<T>(endPoint, "GET", undefined, true, options);
   }
 
   async postWithAuth<T = any>(
@@ -90,8 +96,10 @@ class HttpService {
     endPoint: string,
     options?: RequestOptions,
   ): Promise<ApiResponse<T>> {
-    return this.makeRequest<T>(endPoint, "DELETE", null, true, options);
+    return this.makeRequest<T>(endPoint, "DELETE", undefined, true, options);
   }
+
+  /* ---------------- NON-AUTH REQUESTS ---------------- */
 
   async postWithoutAuth<T = any>(
     endPoint: string,
@@ -105,8 +113,10 @@ class HttpService {
     endPoint: string,
     options?: RequestOptions,
   ): Promise<ApiResponse<T>> {
-    return this.makeRequest<T>(endPoint, "GET", null, false, options);
+    return this.makeRequest<T>(endPoint, "GET", undefined, false, options);
   }
+
+  /* ---------------- FORM DATA (UPLOADS) ---------------- */
 
   async postFormWithAuth<T = any>(
     endPoint: string,
@@ -117,15 +127,14 @@ class HttpService {
       "POST",
       formData,
       true,
-      { headers: {} }, // let browser set multipart boundary
+      { headers: {} }, // allow browser to set multipart boundary
     );
   }
 }
 
-//Export the singleton instance
-export const httpService = new HttpService();
+/* ---------------- EXPORTS ---------------- */
 
-//bind create a new function where this is permanently set to the instance of HttpService
+export const httpService = new HttpService();
 
 export const getWithAuth = httpService.getWithAuth.bind(httpService);
 export const postWithAuth = httpService.postWithAuth.bind(httpService);
@@ -134,4 +143,5 @@ export const deleteWithAuth = httpService.deleteWithAuth.bind(httpService);
 
 export const postWithoutAuth = httpService.postWithoutAuth.bind(httpService);
 export const getWithoutAuth = httpService.getWithoutAuth.bind(httpService);
+
 export const postFormWithAuth = httpService.postFormWithAuth.bind(httpService);
