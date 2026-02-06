@@ -248,7 +248,6 @@ import {
   Upload,
 } from "lucide-react";
 import { Button } from "../ui/button";
-import axios from "axios";
 import { postFormWithAuth } from "@/service/httpService";
 
 interface PrescriptionViewModalProps {
@@ -265,7 +264,7 @@ const PrescriptionViewModal = ({
   const [isOpen, setIsOpen] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  // upload state
+  /* upload state */
   const [files, setFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const [deletingKey, setDeletingKey] = useState<string | null>(null);
@@ -301,23 +300,36 @@ const PrescriptionViewModal = ({
   const submitUpload = async () => {
     if (!files.length) return;
 
+    console.group("[UPLOAD]");
+    console.log("Starting upload");
+    console.log("Files selected:", files.length);
+
     const form = new FormData();
-    files.forEach((f) => form.append("documents", f));
+    files.forEach((file) => form.append("documents", file));
 
     setUploading(true);
     try {
+      console.log(
+        "Sending request to:",
+        `/appointments/${appointment._id}/documents`,
+      );
+
       await postFormWithAuth(
         `/appointments/${appointment._id}/documents`,
         form,
       );
 
+      console.log("Upload completed successfully");
+      console.log("Refreshing appointment data");
+
       setFiles([]);
       await fetchAppointmentById(appointment._id);
     } catch (err) {
-      console.error(err);
-      alert("Upload failed");
+      console.error("Upload failed:", err);
+      alert("Upload failed. Please try again.");
     } finally {
       setUploading(false);
+      console.groupEnd();
     }
   };
 
@@ -329,8 +341,9 @@ const PrescriptionViewModal = ({
 
     setDeletingKey(key);
     try {
-      await axios.delete(
-        `/api/appointments/${appointment._id}/documents/${key}`,
+      await postFormWithAuth(
+        `/appointments/${appointment._id}/documents/${key}`,
+        new FormData(),
       );
       await fetchAppointmentById(appointment._id);
     } finally {
@@ -356,47 +369,21 @@ const PrescriptionViewModal = ({
       {isOpen && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <Card className="w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-            {/* Header */}
             <CardHeader className="flex flex-row justify-between items-center">
               <div className="flex items-center gap-2">
                 <FileText className="w-5 h-5 text-green-600" />
                 <CardTitle>Prescription & Reports</CardTitle>
               </div>
 
-              <div className="flex gap-2">
-                {appointment.prescriptionText && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() =>
-                      copyToClipboard(appointment.prescriptionText)
-                    }
-                  >
-                    {copied ? (
-                      <>
-                        <Check className="w-4 h-4 mr-1" />
-                        Copied
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="w-4 h-4 mr-1" />
-                        Copy
-                      </>
-                    )}
-                  </Button>
-                )}
-
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setIsOpen(false)}
-                >
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsOpen(false)}
+              >
+                <X className="w-4 h-4" />
+              </Button>
             </CardHeader>
 
-            {/* Content */}
             <CardContent className="space-y-6">
               {/* Meta */}
               <div className="flex justify-between">
@@ -414,71 +401,30 @@ const PrescriptionViewModal = ({
                 </div>
               </div>
 
-              {/* Prescription */}
-              {appointment.prescriptionText && (
-                <div className="border border-green-200 bg-green-50 p-4 rounded">
-                  <h3 className="font-semibold mb-2">Prescription</h3>
-                  <pre className="bg-white p-3 rounded border text-sm whitespace-pre-wrap font-mono">
-                    {appointment.prescriptionText}
-                  </pre>
-                </div>
-              )}
-
-              {/* Notes */}
-              {appointment.notes && (
-                <div className="border bg-gray-50 p-4 rounded">
-                  <h3 className="font-semibold mb-2">Notes</h3>
-                  <p className="text-sm whitespace-pre-wrap">
-                    {appointment.notes}
-                  </p>
-                </div>
-              )}
-
               {/* Existing documents */}
               {documents.length > 0 && (
                 <div>
                   <h3 className="font-semibold mb-2">Attached Documents</h3>
-
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                     {documents.map((doc) => (
-                      <div
+                      <a
                         key={doc.key}
-                        className="relative border rounded p-2 group"
+                        href={doc.url}
+                        target="_blank"
+                        className="border rounded p-2 hover:bg-gray-50 transition"
                       >
-                        <a
-                          href={doc.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          {doc.url.endsWith(".pdf") ? (
-                            <div className="flex flex-col items-center justify-center h-24">
-                              <FileText className="w-8 h-8 text-red-600" />
-                              <span className="text-xs mt-1">PDF</span>
-                            </div>
-                          ) : (
-                            <img
-                              src={doc.url}
-                              className="w-full h-24 object-cover rounded"
-                            />
-                          )}
-                        </a>
-
-                        {userType === "doctor" && (
-                          <Button
-                            size="icon"
-                            variant="destructive"
-                            disabled={deletingKey === doc.key}
-                            className="absolute top-1 right-1 opacity-0 group-hover:opacity-100"
-                            onClick={() => confirmDelete(doc.key)}
-                          >
-                            {deletingKey === doc.key ? (
-                              <Loader2 className="w-4 h-4 animate-spin" />
-                            ) : (
-                              <Trash2 className="w-4 h-4" />
-                            )}
-                          </Button>
+                        {doc.url.endsWith(".pdf") ? (
+                          <div className="flex flex-col items-center h-24 justify-center">
+                            <FileText className="w-8 h-8 text-red-600" />
+                            <span className="text-xs mt-1">PDF</span>
+                          </div>
+                        ) : (
+                          <img
+                            src={doc.url}
+                            className="w-full h-24 object-cover rounded"
+                          />
                         )}
-                      </div>
+                      </a>
                     ))}
                   </div>
                 </div>
@@ -489,17 +435,29 @@ const PrescriptionViewModal = ({
                 <div className="border-t pt-4 space-y-4">
                   <h3 className="font-semibold flex items-center gap-2">
                     <Plus className="w-4 h-4" />
-                    Add more documents
+                    Add documents
                   </h3>
 
-                  <input
-                    type="file"
-                    multiple
-                    accept="image/*,.pdf"
-                    onChange={(e) => setFiles(Array.from(e.target.files || []))}
-                  />
+                  {/* Dropzone */}
+                  <label className="border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center text-sm text-gray-600 cursor-pointer hover:border-green-500 transition">
+                    <Upload className="w-6 h-6 mb-2 text-green-600" />
+                    <span>Click to select images or PDFs</span>
+                    <span className="text-xs text-gray-400 mt-1">
+                      Max 10 MB per file
+                    </span>
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*,.pdf"
+                      className="hidden"
+                      onChange={(e) =>
+                        setFiles(Array.from(e.target.files || []))
+                      }
+                      disabled={uploading}
+                    />
+                  </label>
 
-                  {/* Preview */}
+                  {/* Previews */}
                   {previews.length > 0 && (
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                       {previews.map(({ file, preview }, i) => (
@@ -507,7 +465,7 @@ const PrescriptionViewModal = ({
                           {preview ? (
                             <img
                               src={preview}
-                              className="h-24 w-full object-cover"
+                              className="h-24 w-full object-cover rounded"
                             />
                           ) : (
                             <div className="flex flex-col items-center justify-center h-24">
@@ -521,6 +479,7 @@ const PrescriptionViewModal = ({
                             variant="destructive"
                             className="absolute top-1 right-1"
                             onClick={() => removeLocalFile(i)}
+                            disabled={uploading}
                           >
                             <Trash2 className="w-4 h-4" />
                           </Button>
@@ -544,7 +503,7 @@ const PrescriptionViewModal = ({
                       ) : (
                         <>
                           <Upload className="w-4 h-4 mr-2" />
-                          Submit Documents
+                          Upload Documents
                         </>
                       )}
                     </Button>
