@@ -197,26 +197,41 @@ export const useAppointmentStore = create<AppointmentState>((set, get) => ({
     appointmentId: string,
     files: AppointmentDocument[],
   ) => {
-    const res = await postWithAuth(`/appointment/${appointmentId}/documents`, {
-      files,
-    });
+    const res = await postWithAuth(
+      `/api/appointments/${appointmentId}/documents`,
+      { documents: files }, // ✅ metadata only
+    );
 
     set((state) => ({
       appointments: state.appointments.map((a) =>
-        a._id === appointmentId ? res.data : a,
+        a._id === appointmentId ? { ...a, documents: res.data } : a,
       ),
+      currentAppointment:
+        state.currentAppointment?._id === appointmentId
+          ? {
+              ...state.currentAppointment,
+              documents: res.data,
+            }
+          : state.currentAppointment,
     }));
   },
 
   deleteDocument: async (appointmentId: string, key: string) => {
     const res = await deleteWithAuth(
-      `/appointment/${appointmentId}/documents/${key}`,
+      `/api/appointments/${appointmentId}/documents/${key}`,
     );
 
     set((state) => ({
       appointments: state.appointments.map((a) =>
-        a._id === appointmentId ? res.data : a,
+        a._id === appointmentId ? { ...a, documents: res.data } : a,
       ),
+      currentAppointment:
+        state.currentAppointment?._id === appointmentId
+          ? {
+              ...state.currentAppointment,
+              documents: res.data,
+            }
+          : state.currentAppointment,
     }));
   },
 
