@@ -27,10 +27,8 @@ const AppointmentCall = ({
     async (appointmentId: string) => {
       await joinConsultation(appointmentId);
     },
-    [joinConsultation]
+    [joinConsultation],
   );
-
-  
 
   const intializeCall = useCallback(
     async (container: HTMLDivElement) => {
@@ -66,13 +64,15 @@ const AppointmentCall = ({
         } catch (error) {
           console.warn("failed to update appointment", error);
         }
-
+        if (!appointment.zegoRoomId) {
+          throw new Error("Zego room ID is missing for this appointment");
+        }
         const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(
           numericAppId,
           serverSecret,
           appointment.zegoRoomId,
           currentUser.id,
-          currentUser.name
+          currentUser.name,
         );
 
         const zp = ZegoUIKitPrebuilt.create(kitToken);
@@ -104,7 +104,7 @@ const AppointmentCall = ({
           onJoinRoom: () => {
             if (isComponentMountedRef.current) {
               console.log(
-                `Joined ${appointment.consultationType} : ${appointment.zegoRoomId}`
+                `Joined ${appointment.consultationType} : ${appointment.zegoRoomId}`,
               );
             }
           },
@@ -162,7 +162,7 @@ const AppointmentCall = ({
       currentUser.name,
       memoizedJoinConsultation,
       onCallEnd,
-    ]
+    ],
   );
 
   useEffect(() => {
