@@ -236,11 +236,19 @@
 
 import React, { useState } from "react";
 import { Appointment, useAppointmentStore } from "@/store/appointmentStore";
-import { UploadDropzone } from "@/lib/uploadthing";
-import type { UploadThingError } from "uploadthing/server";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import { Check, Copy, FileText, Trash2, X, Plus, Loader2 } from "lucide-react";
+import {
+  Check,
+  Copy,
+  FileText,
+  Trash2,
+  X,
+  Plus,
+  Loader2,
+  Upload,
+} from "lucide-react";
 import { Button } from "../ui/button";
+import axios from "axios";
 
 interface PrescriptionViewModalProps {
   appointment: Appointment;
@@ -255,14 +263,19 @@ const PrescriptionViewModal = ({
 }: PrescriptionViewModalProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  // upload state
+  const [files, setFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const [deletingKey, setDeletingKey] = useState<string | null>(null);
 
-  const { uploadDocuments, deleteDocument } = useAppointmentStore();
+  const { fetchAppointmentById } = useAppointmentStore();
 
   const documents = appointment.documents ?? [];
   const otherUser =
     userType === "doctor" ? appointment.patientId : appointment.doctorId;
+
+  /* ---------------- helpers ---------------- */
 
   const formatDate = (date: string) =>
     new Date(date).toLocaleDateString("en-US", {
@@ -278,19 +291,57 @@ const PrescriptionViewModal = ({
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const removeLocalFile = (index: number) => {
+    setFiles((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  /* ---------------- upload ---------------- */
+
+  const submitUpload = async () => {
+    if (!files.length) return;
+
+    const form = new FormData();
+    files.forEach((f) => form.append("documents", f));
+
+    setUploading(true);
+    try {
+      await axios.post(`/appointments/${appointment._id}/documents`, form, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      setFiles([]);
+      await fetchAppointmentById(appointment._id);
+    } catch (err) {
+      console.error(err);
+      alert("Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  /* ---------------- delete ---------------- */
+
   const confirmDelete = async (key: string) => {
-    const ok = confirm(
-      "Are you sure you want to permanently delete this document?",
-    );
+    const ok = confirm("Delete this document permanently?");
     if (!ok) return;
 
     setDeletingKey(key);
     try {
-      await deleteDocument(appointment._id, key);
+      await axios.delete(`/appointments/${appointment._id}/documents/${key}`);
+      await fetchAppointmentById(appointment._id);
     } finally {
       setDeletingKey(null);
     }
   };
+
+  /* ---------------- previews ---------------- */
+
+  const previews = files.map((file) => ({
+    file,
+    preview: file.type === "application/pdf" ? null : URL.createObjectURL(file),
+  }));
+
+  /* ---------------- render ---------------- */
 
   return (
     <>
@@ -379,7 +430,7 @@ const PrescriptionViewModal = ({
                 </div>
               )}
 
-              {/* Documents */}
+              {/* Existing documents */}
               {documents.length > 0 && (
                 <div>
                   <h3 className="font-semibold mb-2">Attached Documents</h3>
@@ -403,7 +454,6 @@ const PrescriptionViewModal = ({
                           ) : (
                             <img
                               src={doc.url}
-                              alt="document"
                               className="w-full h-24 object-cover rounded"
                             />
                           )}
@@ -430,45 +480,70 @@ const PrescriptionViewModal = ({
                 </div>
               )}
 
-              {/* Upload */}
+              {/* Upload section */}
               {userType === "doctor" && (
-                <div className="border-t pt-4">
-                  <h3 className="font-semibold mb-2 flex items-center gap-2">
+                <div className="border-t pt-4 space-y-4">
+                  <h3 className="font-semibold flex items-center gap-2">
                     <Plus className="w-4 h-4" />
                     Add more documents
                   </h3>
 
-                  <UploadDropzone
-                    endpoint="medicalDocuments"
-                    headers={{
-                      Authorization: `Bearer ${localStorage.getItem("token")}`,
-                    }}
-                    onUploadBegin={() => setUploading(true)}
-                    onClientUploadComplete={(res) => {
-                      setUploading(false);
-                      if (!res?.length) return;
-
-                      uploadDocuments(
-                        appointment._id,
-                        res.map((f) => ({
-                          url: f.url,
-                          key: f.key,
-                          type: "other",
-                        })),
-                      );
-                    }}
-                    onUploadError={(error) => {
-                      setUploading(false);
-                      console.error(error);
-                      alert(error.message);
-                    }}
+                  <input
+                    type="file"
+                    multiple
+                    accept="image/*,.pdf"
+                    onChange={(e) => setFiles(Array.from(e.target.files || []))}
                   />
 
-                  {uploading && (
-                    <div className="flex items-center gap-2 mt-3 text-sm text-gray-600">
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      Uploading…
+                  {/* Preview */}
+                  {previews.length > 0 && (
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                      {previews.map(({ file, preview }, i) => (
+                        <div key={i} className="relative border rounded p-2">
+                          {preview ? (
+                            <img
+                              src={preview}
+                              className="h-24 w-full object-cover"
+                            />
+                          ) : (
+                            <div className="flex flex-col items-center justify-center h-24">
+                              <FileText />
+                              <span className="text-xs">{file.name}</span>
+                            </div>
+                          )}
+
+                          <Button
+                            size="icon"
+                            variant="destructive"
+                            className="absolute top-1 right-1"
+                            onClick={() => removeLocalFile(i)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      ))}
                     </div>
+                  )}
+
+                  {/* Submit */}
+                  {files.length > 0 && (
+                    <Button
+                      onClick={submitUpload}
+                      disabled={uploading}
+                      className="bg-green-600 hover:bg-green-700"
+                    >
+                      {uploading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Uploading…
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="w-4 h-4 mr-2" />
+                          Submit Documents
+                        </>
+                      )}
+                    </Button>
                   )}
                 </div>
               )}
