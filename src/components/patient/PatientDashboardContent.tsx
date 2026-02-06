@@ -435,7 +435,6 @@ const PatientDashboardContent = () => {
                   </Button>
                 </Link>
               )}
-
               {appointment.status === "Completed" &&
                 (appointment.prescriptionText ||
                   (appointment.documents?.length ?? 0) > 0) && (
