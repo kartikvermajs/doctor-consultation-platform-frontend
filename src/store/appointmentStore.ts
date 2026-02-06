@@ -21,6 +21,7 @@ export interface Appointment {
   consultationType: string;
   status: string;
 
+  symptoms?: string;
   prescriptionText?: string;
   notes?: string;
 

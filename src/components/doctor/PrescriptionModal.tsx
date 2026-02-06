@@ -1,41 +1,26 @@
 "use client";
 
 import React, { useState } from "react";
-import { UploadButton } from "@/lib/uploadthing";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { FileText, Save, X } from "lucide-react";
 import { Button } from "../ui/button";
-import { AlertTitle } from "../ui/alert";
 import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
 
-interface UploadedDoc {
-  url: string;
-  key: string;
-  type: "prescription" | "lab-report" | "other";
-}
-
 interface PrescriptionModalProps {
   isOpen: boolean;
-  appointmentId: string;
   patientName: string;
   loading?: boolean;
 
   onClose: () => void;
   onSave: (prescription: string, notes: string) => Promise<void>;
-  uploadDocuments: (
-    appointmentId: string,
-    files: UploadedDoc[],
-  ) => Promise<void>;
 }
 
 const PrescriptionModal = ({
   isOpen,
-  appointmentId,
   patientName,
   onClose,
   onSave,
-  uploadDocuments,
   loading,
 }: PrescriptionModalProps) => {
   const [prescription, setPrescription] = useState("");
@@ -88,34 +73,6 @@ const PrescriptionModal = ({
               rows={6}
               required
             />
-
-            {/* ✅ UPLOADTHING BUTTON */}
-            <UploadButton
-              endpoint="medicalDocuments"
-              headers={{
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-              }}
-              onClientUploadComplete={(res) => {
-                if (!res?.length) return;
-
-                uploadDocuments(
-                  appointmentId,
-                  res.map((f) => ({
-                    url: f.url,
-                    key: f.key,
-                    type: "prescription",
-                  })),
-                );
-              }}
-              onUploadError={(error) => {
-                console.error(error);
-                alert("Upload failed");
-              }}
-            />
-
-            <p className="text-xs text-gray-500">
-              Upload handwritten prescriptions, lab reports, or scans.
-            </p>
           </div>
 
           {/* Notes */}

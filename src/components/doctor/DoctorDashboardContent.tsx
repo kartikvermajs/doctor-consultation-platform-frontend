@@ -61,7 +61,7 @@ const DoctorDashboardContent = () => {
 
   const handleSavePrescription = async (
     prescription: string,
-    notes: string
+    notes: string,
   ) => {
     if (!completingAppointmentId) return;
     setModalLoading(true);
@@ -314,7 +314,8 @@ const DoctorDashboardContent = () => {
                           </p>
 
                           <p className="text-sm text-gray-600 line-clamp-1">
-                            {appointment?.symptoms.substring(0, 80)}
+                            {appointment?.symptoms?.substring(0, 80) ||
+                              "No symptoms provided"}
                           </p>
                           <div className="flex items-center space-x-4 mt-2">
                             <Badge
@@ -349,7 +350,7 @@ const DoctorDashboardContent = () => {
                           )}
                         </div>
                       </div>
-                    )
+                    ),
                   )
                 ) : (
                   <div className="text-center py-12">
@@ -413,7 +414,7 @@ const DoctorDashboardContent = () => {
                             </div>
                           </div>
                         </div>
-                      )
+                      ),
                     )
                   ) : (
                     <div className="text-center py-12">
@@ -454,10 +455,8 @@ const DoctorDashboardContent = () => {
                       {dashboardData?.performance?.completionRate}
                     </span>
                   </div>
-                                <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">
-                      Response Time
-                    </span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">Response Time</span>
                     <span className="font-semibold text-green-600">
                       {dashboardData?.performance?.responseTime}
                     </span>
