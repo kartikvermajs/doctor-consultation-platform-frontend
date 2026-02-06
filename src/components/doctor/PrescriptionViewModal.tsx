@@ -305,7 +305,7 @@ const PrescriptionViewModal = ({
 
     setUploading(true);
     try {
-      await axios.post(`/appointments/${appointment._id}/documents`, form, {
+      await axios.post(`/api/appointments/${appointment._id}/documents`, form, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
@@ -327,7 +327,7 @@ const PrescriptionViewModal = ({
 
     setDeletingKey(key);
     try {
-      await axios.delete(`/appointments/${appointment._id}/documents/${key}`);
+      await axios.delete(`/api/appointments/${appointment._id}/documents/${key}`);
       await fetchAppointmentById(appointment._id);
     } finally {
       setDeletingKey(null);

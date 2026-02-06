@@ -154,7 +154,7 @@ export const useAppointmentStore = create<AppointmentState>((set, get) => ({
   fetchAppointmentById: async (appointmentId) => {
     set({ loading: true, error: null });
     try {
-      const response = await getWithAuth(`/api/appointment/${appointmentId}`);
+      const response = await getWithAuth(`/appointment/${appointmentId}`);
       set({ currentAppointment: response?.data?.appointment });
       return response?.data?.appointment;
     } catch (error: any) {
@@ -199,7 +199,7 @@ export const useAppointmentStore = create<AppointmentState>((set, get) => ({
   ) => {
     const res = await postWithAuth(
       `/api/appointments/${appointmentId}/documents`,
-      { documents: files }, // ✅ metadata only
+      { documents: files },
     );
 
     set((state) => ({

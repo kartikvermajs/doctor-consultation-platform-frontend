@@ -31,7 +31,7 @@ export default function DeferredUploadDocuments({
 
     setUploading(true);
     try {
-      await axios.post(`/appointments/${appointmentId}/documents`, form, {
+      await axios.post(`/api/appointments/${appointmentId}/documents`, form, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setFiles([]);
