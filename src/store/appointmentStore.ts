@@ -26,6 +26,8 @@ export interface Appointment {
 
   documents?: AppointmentDocument[];
 
+  zegoRoomId?: string;
+
   createdAt: string;
 }
 
