@@ -440,6 +440,9 @@ const PrescriptionViewModal = ({
 
                   <UploadDropzone
                     endpoint="medicalDocuments"
+                    headers={{
+                      Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    }}
                     onUploadBegin={() => setUploading(true)}
                     onClientUploadComplete={(res) => {
                       setUploading(false);
