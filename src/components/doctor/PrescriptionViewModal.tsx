@@ -401,6 +401,26 @@ const PrescriptionViewModal = ({
                 </div>
               </div>
 
+              {/* Prescription */}
+              {appointment.prescriptionText && (
+                <div className="border border-green-200 bg-green-50 p-4 rounded">
+                  <h3 className="font-semibold mb-2">Prescription</h3>
+                  <pre className="bg-white p-3 rounded border text-sm whitespace-pre-wrap font-mono">
+                    {appointment.prescriptionText}
+                  </pre>
+                </div>
+              )}
+
+              {/* Notes */}
+              {appointment.notes && (
+                <div className="border bg-gray-50 p-4 rounded">
+                  <h3 className="font-semibold mb-2">Notes</h3>
+                  <p className="text-sm whitespace-pre-wrap">
+                    {appointment.notes}
+                  </p>
+                </div>
+              )}
+
               {/* Existing documents */}
               {documents.length > 0 && (
                 <div>
