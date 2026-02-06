@@ -1,22 +1,32 @@
-import { getWithAuth, postWithAuth, putWithAuth } from "@/service/httpService";
+import {
+  deleteWithAuth,
+  getWithAuth,
+  postWithAuth,
+  putWithAuth,
+} from "@/service/httpService";
 import { create } from "zustand";
+
+export interface AppointmentDocument {
+  url: string;
+  key: string;
+  type: "lab-report" | "prescription" | "other";
+}
 
 export interface Appointment {
   _id: string;
   doctorId: any;
   patientId: any;
-  date: string;
   slotStartIso: string;
   slotEndIso: string;
-  consultationType: "Video Consultation" | "Voice Call";
-  status: "Scheduled" | "Completed" | "Cancelled" | "In Progress";
-  symptoms: string;
-  zegoRoomId: string;
-  fees: number;
-  prescription?: string;
+  consultationType: string;
+  status: string;
+
+  prescriptionText?: string;
   notes?: string;
+
+  documents?: AppointmentDocument[];
+
   createdAt: string;
-  updatedAt: string;
 }
 
 interface AppointmentFilters {
@@ -41,35 +51,50 @@ interface BookingData {
 }
 
 interface AppointmentState {
+  /* ---------- STATE ---------- */
   appointments: Appointment[];
   bookedSlots: string[];
   currentAppointment: Appointment | null;
   loading: boolean;
   error: string | null;
 
-  //Actions
+  /* ---------- LOCAL ACTIONS ---------- */
   clearError: () => void;
   setCurrentAppointment: (appointment: Appointment) => void;
 
-  //Api Actions
+  /* ---------- API ACTIONS ---------- */
   fetchAppointments: (
     role: "doctor" | "patient",
     tab?: string,
-    filters?: AppointmentFilters
+    filters?: AppointmentFilters,
   ) => Promise<void>;
+
   fetchBookedSlots: (doctorId: string, date: string) => Promise<void>;
+
   fetchAppointmentById: (appointmentId: string) => Promise<Appointment | null>;
+
   bookAppointment: (data: BookingData) => Promise<any>;
+
   joinConsultation: (appointmentId: string) => Promise<any>;
+
   endConsultation: (
     appointmentId: string,
     prescription?: string,
-    notes?: string
+    notes?: string,
   ) => Promise<void>;
+
   updateAppointmentStatus: (
     appointmentId: string,
-    status: string
+    status: string,
   ) => Promise<void>;
+
+  /* ---------- DOCUMENT ACTIONS (NEW + REQUIRED) ---------- */
+  uploadDocuments: (
+    appointmentId: string,
+    files: AppointmentDocument[],
+  ) => Promise<void>;
+
+  deleteDocument: (appointmentId: string, key: string) => Promise<void>;
 }
 
 export const useAppointmentStore = create<AppointmentState>((set, get) => ({
@@ -113,13 +138,13 @@ export const useAppointmentStore = create<AppointmentState>((set, get) => ({
         }
       });
       const response = await getWithAuth(
-        `${endPoint}?${queryParams.toString()}`
+        `${endPoint}?${queryParams.toString()}`,
       );
       set({ appointments: response.data || [] });
     } catch (error: any) {
       set({ error: error.message });
     } finally {
-      set({ loading: false, error: null });
+      set({ loading: false });
     }
   },
 
@@ -132,7 +157,7 @@ export const useAppointmentStore = create<AppointmentState>((set, get) => ({
     } catch (error: any) {
       set({ error: error.message });
     } finally {
-      set({ loading: false, error: null });
+      set({ loading: false });
     }
   },
 
@@ -140,13 +165,13 @@ export const useAppointmentStore = create<AppointmentState>((set, get) => ({
     set({ loading: true, error: null });
     try {
       const response = await getWithAuth(
-        `/appointment/booked-slots/${doctorId}/${date}`
+        `/appointment/booked-slots/${doctorId}/${date}`,
       );
       set({ bookedSlots: response?.data });
     } catch (error: any) {
       set({ error: error.message });
     } finally {
-      set({ loading: false, error: null });
+      set({ loading: false });
     }
   },
 
@@ -161,8 +186,35 @@ export const useAppointmentStore = create<AppointmentState>((set, get) => ({
     } catch (error: any) {
       set({ error: error.message });
     } finally {
-      set({ loading: false, error: null });
+      set({ loading: false });
     }
+  },
+
+  uploadDocuments: async (
+    appointmentId: string,
+    files: AppointmentDocument[],
+  ) => {
+    const res = await postWithAuth(`/appointment/${appointmentId}/documents`, {
+      files,
+    });
+
+    set((state) => ({
+      appointments: state.appointments.map((a) =>
+        a._id === appointmentId ? res.data : a,
+      ),
+    }));
+  },
+
+  deleteDocument: async (appointmentId: string, key: string) => {
+    const res = await deleteWithAuth(
+      `/appointment/${appointmentId}/documents/${key}`,
+    );
+
+    set((state) => ({
+      appointments: state.appointments.map((a) =>
+        a._id === appointmentId ? res.data : a,
+      ),
+    }));
   },
 
   joinConsultation: async (appointmentId) => {
@@ -172,8 +224,8 @@ export const useAppointmentStore = create<AppointmentState>((set, get) => ({
       set((state) => ({
         appointments: state.appointments.map((apt) =>
           apt._id === appointmentId
-            ? { ...apt, staus: "In Progress" as const }
-            : apt
+            ? { ...apt, status: "In Progress" as const }
+            : apt,
         ),
         currentAppointment:
           state.currentAppointment?._id === appointmentId
@@ -185,21 +237,21 @@ export const useAppointmentStore = create<AppointmentState>((set, get) => ({
     } catch (error: any) {
       set({ error: error.message });
     } finally {
-      set({ loading: false, error: null });
+      set({ loading: false });
     }
   },
   endConsultation: async (appointmentId, prescription, notes) => {
     set({ loading: true, error: null });
     try {
       const response = await putWithAuth(`/appointment/end/${appointmentId}`, {
-        prescription,
+        prescriptionText: prescription,
         notes,
       });
       set((state) => ({
         appointments: state.appointments.map((apt) =>
           apt._id === appointmentId
-            ? { ...apt, staus: "Completed" as const }
-            : apt
+            ? { ...apt, status: "Completed" as const }
+            : apt,
         ),
         currentAppointment:
           state.currentAppointment?._id === appointmentId
@@ -211,22 +263,23 @@ export const useAppointmentStore = create<AppointmentState>((set, get) => ({
     } catch (error: any) {
       set({ error: error.message });
     } finally {
-      set({ loading: false, error: null });
+      set({ loading: false });
     }
   },
   updateAppointmentStatus: async (appointmentId, status) => {
-     set({ loading: true, error: null });
+    set({ loading: true, error: null });
     try {
-      const response = await putWithAuth(`/appointment/status/${appointmentId}`, {status});
+      const response = await putWithAuth(
+        `/appointment/status/${appointmentId}`,
+        { status },
+      );
       set((state) => ({
         appointments: state.appointments.map((apt) =>
-          apt._id === appointmentId
-            ? { ...apt, staus: status as any }
-            : apt
+          apt._id === appointmentId ? { ...apt, status: status as any } : apt,
         ),
         currentAppointment:
           state.currentAppointment?._id === appointmentId
-            ? { ...state.currentAppointment, status: status as any}
+            ? { ...state.currentAppointment, status: status as any }
             : state.currentAppointment,
       }));
 
@@ -234,7 +287,7 @@ export const useAppointmentStore = create<AppointmentState>((set, get) => ({
     } catch (error: any) {
       set({ error: error.message });
     } finally {
-      set({ loading: false, error: null });
+      set({ loading: false });
     }
   },
 }));

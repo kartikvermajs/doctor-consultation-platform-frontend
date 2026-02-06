@@ -1,5 +1,7 @@
 "use client";
+
 import React, { useState } from "react";
+import { UploadButton } from "@/lib/uploadthing";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { FileText, Save, X } from "lucide-react";
 import { Button } from "../ui/button";
@@ -7,18 +9,33 @@ import { AlertTitle } from "../ui/alert";
 import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
 
+interface UploadedDoc {
+  url: string;
+  key: string;
+  type: "prescription" | "lab-report" | "other";
+}
+
 interface PrescriptionModalProps {
   isOpen: boolean;
-  onClose: () => void;
-  onSave: (prescription: string, notes: string) => Promise<void>;
+  appointmentId: string;
   patientName: string;
   loading?: boolean;
+
+  onClose: () => void;
+  onSave: (prescription: string, notes: string) => Promise<void>;
+  uploadDocuments: (
+    appointmentId: string,
+    files: UploadedDoc[],
+  ) => Promise<void>;
 }
+
 const PrescriptionModal = ({
   isOpen,
+  appointmentId,
+  patientName,
   onClose,
   onSave,
-  patientName,
+  uploadDocuments,
   loading,
 }: PrescriptionModalProps) => {
   const [prescription, setPrescription] = useState("");
@@ -27,13 +44,9 @@ const PrescriptionModal = ({
   if (!isOpen) return null;
 
   const handleSave = async () => {
-    try {
-      await onSave(prescription, notes);
-      setPrescription("");
-      setNotes("");
-    } catch (error) {
-      console.error("Failed to save prescription");
-    }
+    await onSave(prescription, notes);
+    setPrescription("");
+    setNotes("");
   };
 
   const handleClose = () => {
@@ -41,11 +54,12 @@ const PrescriptionModal = ({
     setNotes("");
     onClose();
   };
+
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
       <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <div className="flex items-center space-x-2">
+        <CardHeader className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
             <FileText className="w-5 h-5 text-green-600" />
             <CardTitle>Complete Consultation</CardTitle>
           </div>
@@ -53,75 +67,79 @@ const PrescriptionModal = ({
             <X className="w-4 h-4" />
           </Button>
         </CardHeader>
+
         <CardContent className="space-y-6">
-          <div className="flex items-start space-x-3 p-4 bg-green-50 rounded-lg">
-            <AlertTitle className="w-5 h-5 text-green-600 mt-0.5" />
-
-            <div>
-              <h3 className="font-semibold text-green-900">
-                Confirm Consultation Completion
-              </h3>
-              <p className="text-sm text-green-700 mt-1">
-                Are your sure you want to mark the consultation with{" "}
-                <strong>{patientName}</strong> as completed?
-              </p>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="prescription" className="text-sm font-medium">
-              Prescription <span className="text-red-500">*</span>
-            </Label>
-            <Textarea
-              id="prescription"
-              value={prescription}
-              onChange={(e) => setPrescription(e.target.value)}
-              placeholder="Enter prescription details, medications, dosages, and intructions"
-              rows={6}
-              className="min-h-[120px]"
-              required
-            />
-            <p className="text-xs text-gray-500">
-              Include medication names, dosages, frequency, and any special
-              intructions.
+          <div className="p-4 bg-green-50 rounded-lg">
+            <h3 className="font-semibold text-green-900">
+              Confirm Consultation Completion
+            </h3>
+            <p className="text-sm text-green-700">
+              Are you sure you want to complete the consultation with{" "}
+              <strong>{patientName}</strong>?
             </p>
           </div>
 
+          {/* Prescription */}
           <div className="space-y-2">
-            <Label htmlFor="notes" className="text-sm font-medium">
-              Additonal Notes (Optional)
-            </Label>
+            <Label>Prescription *</Label>
             <Textarea
-              id="notes"
+              value={prescription}
+              onChange={(e) => setPrescription(e.target.value)}
+              rows={6}
+              required
+            />
+
+            {/* ✅ UPLOADTHING BUTTON */}
+            <UploadButton
+              endpoint="medicalDocuments"
+              headers={{
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              }}
+              onClientUploadComplete={(res) => {
+                if (!res?.length) return;
+
+                uploadDocuments(
+                  appointmentId,
+                  res.map((f) => ({
+                    url: f.url,
+                    key: f.key,
+                    type: "prescription",
+                  })),
+                );
+              }}
+              onUploadError={(error) => {
+                console.error(error);
+                alert("Upload failed");
+              }}
+            />
+
+            <p className="text-xs text-gray-500">
+              Upload handwritten prescriptions, lab reports, or scans.
+            </p>
+          </div>
+
+          {/* Notes */}
+          <div className="space-y-2">
+            <Label>Additional Notes</Label>
+            <Textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="Any additional notes about the consultation, follow-up intructions, etc..."
               rows={4}
-              className="min-h-[120px]"
             />
           </div>
 
-          <div className="flex justify-end space-x-3 pt-4 border-t">
-            <Button variant="outline" onClick={handleClose} disabled={loading}>
+          {/* Actions */}
+          <div className="flex justify-end gap-3 pt-4 border-t">
+            <Button variant="outline" onClick={handleClose}>
               Cancel
             </Button>
-
             <Button
               onClick={handleSave}
               disabled={!prescription.trim() || loading}
               className="bg-green-600 hover:bg-green-700"
             >
-              {loading ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" />
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <Save className="w-4 h-4 mr-2" />
-                  Save to Complete
-                </>
-              )}
+              <Save className="w-4 h-4 mr-2" />
+              Save & Complete
             </Button>
           </div>
         </CardContent>

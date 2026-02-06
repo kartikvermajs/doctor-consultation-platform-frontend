@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useEffect, useState } from "react";
 import Header from "../landing/Header";
 import { userAuthStore } from "@/store/authStore";
@@ -6,7 +7,15 @@ import { Appointment, useAppointmentStore } from "@/store/appointmentStore";
 import { Card, CardContent } from "../ui/card";
 import Link from "next/link";
 import { Button } from "../ui/button";
-import { Calendar, Clock, FileText, MapPin, Phone, Star, Stethoscope, Video, XCircle } from "lucide-react";
+import {
+  Calendar,
+  Clock,
+  Phone,
+  Star,
+  Stethoscope,
+  Video,
+  XCircle,
+} from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Badge } from "../ui/badge";
@@ -15,49 +24,47 @@ import PrescriptionViewModal from "./PrescriptionViewModal";
 
 const DoctorAppointmentContent = () => {
   const { user } = userAuthStore();
-  const { appointments, fetchAppointments, loading ,updateAppointmentStatus} = useAppointmentStore();
-  const [activeTab, setActiveTab] = useState("upcoming");
-  const [tabCounts, setTabCounts] = useState({
-    upcoming: 0,
-    past: 0,
-  });
+  const { appointments, fetchAppointments, loading, updateAppointmentStatus } =
+    useAppointmentStore();
 
+  const [activeTab, setActiveTab] = useState<"upcoming" | "past">("upcoming");
+  const [tabCounts, setTabCounts] = useState({ upcoming: 0, past: 0 });
+
+  /* ---------------- fetch appointments ---------------- */
   useEffect(() => {
     if (user?.type === "doctor") {
       fetchAppointments("doctor", activeTab);
     }
   }, [user, activeTab, fetchAppointments]);
 
-  //update tab counts whever appointmnet chnage
+  /* ---------------- tab counts ---------------- */
   useEffect(() => {
     const now = new Date();
-    //filter the upcoming appointmnet
-    const upcomingAppointments = appointments.filter((apt) => {
-      const aptDate = new Date(apt.slotStartIso);
+
+    const upcoming = appointments.filter((apt) => {
+      const start = new Date(apt.slotStartIso);
       return (
-        (aptDate >= now || apt.status === "In Progress") &&
-        (apt.status === "Scheduled" || apt.status === "In Progress")
+        (start >= now || apt.status === "In Progress") &&
+        ["Scheduled", "In Progress"].includes(apt.status)
       );
     });
 
-    //filter the past appointmnet
-    const pastAppointments = appointments.filter((apt) => {
-      const aptDate = new Date(apt.slotStartIso);
+    const past = appointments.filter((apt) => {
+      const start = new Date(apt.slotStartIso);
       return (
-        aptDate < now ||
-        apt.status === "Completed" ||
-        apt.status === "Cancelled"
+        start < now || apt.status === "Completed" || apt.status === "Cancelled"
       );
     });
 
     setTabCounts({
-      upcoming: upcomingAppointments.length,
-      past: pastAppointments.length,
+      upcoming: upcoming.length,
+      past: past.length,
     });
   }, [appointments]);
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+  /* ---------------- helpers ---------------- */
+  const formatDate = (date: string) =>
+    new Date(date).toLocaleDateString("en-US", {
       weekday: "long",
       year: "numeric",
       month: "long",
@@ -65,86 +72,72 @@ const DoctorAppointmentContent = () => {
       hour: "2-digit",
       minute: "2-digit",
     });
-  };
 
-  const isToday = (dateString: string) => {
-    const today = new Date();
-    const appointmentDate = new Date(dateString);
-    return appointmentDate.toDateString() === today.toDateString();
-  };
+  const isToday = (date: string) =>
+    new Date(date).toDateString() === new Date().toDateString();
 
-  const canJoinCall = (appointment: any) => {
-    const appointmentTime = new Date(appointment.slotStartIso);
-    const now = new Date();
-    const diffMintues = (appointmentTime.getTime() - now.getTime()) / (1000 * 60);
+  const canJoinCall = (appointment: Appointment) => {
+    const start = new Date(appointment.slotStartIso);
+    const diff = (start.getTime() - Date.now()) / (1000 * 60);
 
     return (
       isToday(appointment.slotStartIso) &&
-      diffMintues <= 15 && //not earliar than 15 min before start
-      diffMintues >= -120 && //not later than 2 hours after start
-      (appointment.status === "Scheduled" ||
-        appointment.status === "In Progress")
+      diff <= 15 &&
+      diff >= -120 &&
+      ["Scheduled", "In Progress"].includes(appointment.status)
     );
   };
 
+  const canMarkCancelled = (appointment: Appointment) =>
+    appointment.status === "Scheduled" &&
+    new Date() > new Date(appointment.slotStartIso);
 
-  const canMarkCancelled = (appointment:any) => {
-    const appointmentTime = new Date(appointment.slotStartIso);
-    const now = new Date();
+  const handleMarkCancelled = async (id: string) => {
+    if (
+      !confirm("Are you sure you want to mark this appointment as cancelled?")
+    )
+      return;
 
-    return appointment.status === 'Scheduled' && now > appointmentTime;
-  }
+    await updateAppointmentStatus(id, "Cancelled");
+    fetchAppointments("doctor", activeTab);
+  };
 
-  const handleMarkCancelled = async(appointmentId:string) => {
-    if(
-      confirm("Are you sure you want to mark this appointment as cancelled")
-    ){
-      try {
-         await updateAppointmentStatus(appointmentId,'Cancelled')
-         if(user?.type === 'doctor') {
-          fetchAppointments('doctor', activeTab);
-         }
-      } catch (error) {
-         console.error('Failed to mark cancel appointment',error)
-      }
-    }
-  }
+  if (!user) return null;
 
-  if (!user) {
-    return null;
-  }
+  type Tab = "upcoming" | "past";
 
+  const EMPTY_STATE_KEY_MAP: Record<Tab, keyof typeof emptyStates> = {
+    upcoming: "upcoming",
+    past: "completed",
+  };
+
+  /* ---------------- appointment card ---------------- */
   const AppointmentCard = ({ appointment }: { appointment: Appointment }) => (
     <Card className="hover:shadow-lg transition-shadow">
       <CardContent className="p-6">
-        <div className="flex flex-col items-center md:flex-row md:items-start md:space-x-6">
-          <div className="flex-shrink-0 flex justify-center md:justify-start">
-            <Avatar className="w-20 h-20">
-              <AvatarImage
-                src={appointment.patientId?.profileImage}
-                alt={appointment.patientId?.name}
-              />
-              <AvatarFallback className="bg-green-100 text-green-600 text-lg font-semibold">
-                {appointment.patientId?.name?.charAt(0)}
-              </AvatarFallback>
-            </Avatar>
-          </div>
+        <div className="flex flex-col md:flex-row gap-6">
+          <Avatar className="w-20 h-20">
+            <AvatarImage src={appointment.patientId?.profileImage} />
+            <AvatarFallback className="bg-green-100 text-green-600 text-lg">
+              {appointment.patientId?.name?.charAt(0)}
+            </AvatarFallback>
+          </Avatar>
 
-          <div className="mt-4 md:mt-0 flex-1 w-full text-center md:text-left">
-            <div className="flex flex-col md:flex-row md:justify-between md:items-start">
+          <div className="flex-1 space-y-4">
+            <div className="flex justify-between">
               <div>
-                <h3 className="text-lg font-semiboldtext-gray-900">
+                <h3 className="text-lg font-semibold">
                   {appointment.patientId?.name}
                 </h3>
-                <p className="text-gray-600">
-                 Age : {appointment.patientId?.age}
+                <p className="text-sm text-gray-600">
+                  Age: {appointment.patientId?.age}
                 </p>
-                       <p className="text-sm text-gray-600">
-                 {appointment.patientId?.email}
+                <p className="text-sm text-gray-600">
+                  {appointment.patientId?.email}
                 </p>
               </div>
 
-              <div className="mt-2 md:mt-0 text-center md:text-right">
+              <div className="text-right">
                 <Badge className={getStatusColor(appointment.status)}>
                   {appointment.status}
                 </Badge>
@@ -156,227 +149,131 @@ const DoctorAppointmentContent = () => {
               </div>
             </div>
 
-            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <div className="flex items-center justify-center md:justify-start space-x-2 text-sm text-gray-600">
-                  <Calendar className="w-4 h-4" />
-                  <span>{formatDate(appointment.slotStartIso)}</span>
-                </div>
-
-                <div className="flex items-center justify-center md:justify-start space-x-2 text-sm text-gray-600">
-                  {appointment.consultationType === "Video Consultation" ? (
-                    <Video className="w-4 h-4" />
-                  ) : (
-                    <Phone className="w-4 h-4" />
-                  )}
-                  <span>{appointment.consultationType}</span>
-                </div>
+            <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-600">
+              <div className="flex items-center gap-2">
+                <Calendar className="w-4 h-4" />
+                {formatDate(appointment.slotStartIso)}
               </div>
 
-              <div className="text-center md:text-left">
-                <div className="flex justify-center gap-2 text-sm text-gray-600">
-                  <span className="font-semibold">Fee:</span>
-                  <p>₹{appointment.doctorId?.fees}</p>
-                </div>
-
-                {appointment.symptoms && (
-                  <div className="flex justify-center gap-2 text-sm text-gray-600 mt-1">
-                    <span className="font-semibold">Symptoms</span>
-                    <p className="text-xs text-gray-500 mt-1 line-clamp-2">
-                      {appointment.symptoms}
-                    </p>
-                  </div>
+              <div className="flex items-center gap-2">
+                {appointment.consultationType === "Video Consultation" ? (
+                  <Video className="w-4 h-4" />
+                ) : (
+                  <Phone className="w-4 h-4" />
                 )}
+                {appointment.consultationType}
               </div>
             </div>
 
-            <div className="mt-6 flex flex-col md:flex-row items-center md:justify-between space-y-3 md:space-y-0">
-
-            <div className="flex space-x-2">
+            <div className="flex flex-wrap gap-2 pt-2">
               {canJoinCall(appointment) && (
                 <Link href={`/call/${appointment._id}`}>
-                <Button
-                 size='sm'
-                 className="bg-green-600 hover:bg-green-700"
-                >
-                  <Video className="w-4 h-4 mr-2"/>
-                  Start Consultation
-                  </Button></Link>
+                  <Button size="sm" className="bg-green-600 hover:bg-green-700">
+                    <Video className="w-4 h-4 mr-2" />
+                    Start Consultation
+                  </Button>
+                </Link>
               )}
 
-           <div>
-            {canMarkCancelled(appointment) && (
-              <Button
-               variant='outline'
-               size='sm'
-               className="text-red-600 hover:text-red-700 hover:bg-red-50"
-               onClick={() => handleMarkCancelled(appointment._id)}
-              >
-                <XCircle className="w-4 h-4 mr-2"/>
-                Mark Cancelled
-              </Button>
-            )}
-           </div>
-                  {appointment.status === 'Completed' && appointment.prescription && (
-                    <PrescriptionViewModal
-                     appointment={appointment}
-                     userType="doctor"
-                     trigger={
-                      <Button
-                       variant='outline'
-                       size='sm'
-                       className="text-green-700 border-green-200 hover:bg-green-50"
-                      >
-                        <Stethoscope className="w-4 h-4 mr-2"/>
+              {canMarkCancelled(appointment) && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="text-red-600"
+                  onClick={() => handleMarkCancelled(appointment._id)}
+                >
+                  <XCircle className="w-4 h-4 mr-2" />
+                  Mark Cancelled
+                </Button>
+              )}
+
+              {appointment.status === "Completed" &&
+                (appointment.prescriptionText ||
+                  (appointment.documents?.length ?? 0) > 0) && (
+                  <PrescriptionViewModal
+                    appointment={appointment}
+                    userType="doctor"
+                    trigger={
+                      <Button size="sm" variant="outline">
+                        <Stethoscope className="w-4 h-4 mr-2" />
                         View Report
                       </Button>
-                     }
-                    />
-                  )}
-
-
-
+                    }
+                  />
+                )}
             </div>
 
-            {appointment.status === 'Completed' && (
-              <div className="flex items-center space-x-1">
-                {[...Array(5)].map((_,i) => (
+            {appointment.status === "Completed" && (
+              <div className="flex gap-1">
+                {Array.from({ length: 5 }).map((_, i) => (
                   <Star
-                   className="w-4 h-4 fill-yellow-400 text-yellow-400"
+                    key={i}
+                    className="w-4 h-4 fill-yellow-400 text-yellow-400"
                   />
                 ))}
-                </div>
+              </div>
             )}
-            </div>
           </div>
         </div>
       </CardContent>
     </Card>
   );
 
-  const EmptyState = ({ tab }: { tab: string }) => {
-
-
-    const state = emptyStates[tab as keyof typeof emptyStates];
+  /* ---------------- empty state ---------------- */
+  const EmptyState = ({ tab }: { tab: Tab }) => {
+    const state = emptyStates[EMPTY_STATE_KEY_MAP[tab]];
     const Icon = state.icon;
+
     return (
       <Card>
         <CardContent className="p-12 text-center">
           <Icon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            {state.title}
-          </h3>
-          <p className="text-gray-600 mb-6">{state.description}</p>
+          <h3 className="text-lg font-semibold mb-2">{state.title}</h3>
+          <p className="text-gray-600">{state.description}</p>
         </CardContent>
       </Card>
     );
   };
 
+  /* ---------------- render ---------------- */
   return (
     <>
-      <Header showDashboardNav={true} />
+      <Header showDashboardNav />
 
       <div className="min-h-screen bg-gray-50 pt-16">
         <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h1 className="text-md md:text-3xl font-bold text-gray-900">
-                My Appointment
-              </h1>
-              <p className="text-xs md:text-lg text-gray-600">
-                Manage your patient consultations
-              </p>
-            </div>
-
-            <div className="flex items-center space-x-4 ">
-              <Link href="/dcotor/profile">
-                <Button>
-                  <Calendar className="w-4 h-4 mr-2 " />
-                   Update Availability
-                </Button>
-              </Link>
-            </div>
-          </div>
-
           <Tabs
             value={activeTab}
-            onValueChange={setActiveTab}
-            className="space-y-6"
+            onValueChange={(value) => {
+              if (value === "upcoming" || value === "past") {
+                setActiveTab(value);
+              }
+            }}
           >
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger
-                value="upcoming"
-                className="flex items-center space-x-2"
-              >
-                <Clock className="w-4 h-4" />
-                <span>Upcoming ({tabCounts.upcoming})</span>
+            <TabsList className="grid grid-cols-2">
+              <TabsTrigger value="upcoming">
+                Upcoming ({tabCounts.upcoming})
               </TabsTrigger>
-              <TabsTrigger value="past" className="flex items-center space-x-2">
-                <Calendar className="w-4 h-4" />
-                <span>Past ({tabCounts.past})</span>
-              </TabsTrigger>
+              <TabsTrigger value="past">Past ({tabCounts.past})</TabsTrigger>
             </TabsList>
 
             <TabsContent value="upcoming" className="space-y-4">
-              {loading ? (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 ">
-                  {[...Array(4)].map((_, i) => (
-                    <Card key={i} className="animate-pulse">
-                      <CardContent className="p-6">
-                        <div className="flex space-x-4">
-                          <div className="w-16 h-16 bg-gray-200 rounded-full"></div>
-                          <div className="flex-1 space-y-2">
-                            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                            <div className="h-3 bg-gray-200 rounded w-3/4"></div>
-                            <div className="h-3 bg-gray-200 rounded w-3/4"></div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              ) : appointments.length > 0 ? (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {appointments.map((appointment) => (
-                    <AppointmentCard
-                      key={appointment._id}
-                      appointment={appointment}
-                    />
-                  ))}
-                </div>
+              {loading ? null : appointments.length ? (
+                appointments.map((apt) => (
+                  <AppointmentCard key={apt._id} appointment={apt} />
+                ))
               ) : (
                 <EmptyState tab="upcoming" />
               )}
             </TabsContent>
+
             <TabsContent value="past" className="space-y-4">
-              {loading ? (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 ">
-                  {[...Array(4)].map((_, i) => (
-                    <Card key={i} className="animate-pulse">
-                      <CardContent className="p-6">
-                        <div className="flex space-x-4">
-                          <div className="w-16 h-16 bg-gray-200 rounded-full"></div>
-                          <div className="flex-1 space-y-2">
-                            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                            <div className="h-3 bg-gray-200 rounded w-3/4"></div>
-                            <div className="h-3 bg-gray-200 rounded w-3/4"></div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              ) : appointments.length > 0 ? (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {appointments.map((appointment) => (
-                    <AppointmentCard
-                      key={appointment?._id}
-                      appointment={appointment}
-                    />
-                  ))}
-                </div>
+              {loading ? null : appointments.length ? (
+                appointments.map((apt) => (
+                  <AppointmentCard key={apt._id} appointment={apt} />
+                ))
               ) : (
-                <EmptyState tab="completed" />
+                <EmptyState tab="past" />
               )}
             </TabsContent>
           </Tabs>
