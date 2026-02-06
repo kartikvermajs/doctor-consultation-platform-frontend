@@ -305,7 +305,7 @@ const PrescriptionViewModal = ({
 
     setUploading(true);
     try {
-      await axios.post(`/api/appointments/${appointment._id}/documents`, form, {
+      await axios.post(`/appointments/${appointment._id}/documents`, form, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
